@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Quizzes</title>
+    <style>
+        /* Reset y estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        /* Pantalla de entrada de texto */
+        .input-screen {
+            padding: 30px;
+        }
+
+        .format-info {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .format-info h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .format-example {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.9em;
+            margin-top: 10px;
+            white-space: pre-line;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Pantalla del quiz */
+        .quiz-screen {
+            display: none;
+            padding: 30px;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .question-counter {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .question-card {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .option.correct {
+            border-color: #4caf50;
+            background: #e8f5e9;
+        }
+
+        .option.incorrect {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.correct {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+
+        .feedback.incorrect {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+
+        /* Pantalla de resultados */
+        .results-screen {
+            display: none;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .score-percentage {
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .score-text {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .results-details {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .results-details p {
+            margin: 10px 0;
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        /* Botones */
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-secondary {
+            background: #6c757d;
+        }
+
+        .button-secondary:hover {
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Mensajes de error */
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f44336;
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .score-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .score-percentage {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Generador de Quizzes</h1>
+            <p class="subtitle">Crea y practica con tus propios cuestionarios</p>
+        </header>
+
+        <!-- Pantalla de entrada de texto -->
+        <div class="input-screen" id="inputScreen">
+            <div class="format-info">
+                <h3>📋 Formato de entrada:</h3>
+                <p>Introduce tus preguntas siguiendo este formato:</p>
+                <div class="format-example">P: ¿Cuál es la capital de Francia?
+A) Madrid
+B) París *
+C) Londres
+D) Berlín
+
+P: ¿Cuántos continentes hay?
+A) 5
+B) 6
+C) 7 *
+D) 8</div>
+                <p style="margin-top: 10px;"><strong>Instrucciones:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 5px;">
+                    <li>Cada pregunta comienza con "P:"</li>
+                    <li>Las opciones comienzan con A), B), C), etc.</li>
+                    <li>Marca la respuesta correcta con un asterisco (*) al final</li>
+                    <li>Deja una línea en blanco entre preguntas</li>
+                </ul>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <textarea id="quizInput" placeholder="Introduce aquí tus preguntas siguiendo el formato indicado..."></textarea>
+
+            <div class="button-group">
+                <button class="button" onclick="startQuiz()">🚀 Comenzar Quiz</button>
+            </div>
+        </div>
+
+        <!-- Pantalla del quiz -->
+        <div class="quiz-screen" id="quizScreen">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="question-counter" id="questionCounter"></div>
+
+            <div class="question-card">
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <div class="button-group">
+                <button class="button" id="nextButton" onclick="nextQuestion()" style="display: none;">
+                    Siguiente →
+                </button>
+            </div>
+        </div>
+
+        <!-- Pantalla de resultados -->
+        <div class="results-screen" id="resultsScreen">
+            <h2>🎉 ¡Quiz Completado!</h2>
+            
+            <div class="score-circle">
+                <div class="score-percentage" id="scorePercentage"></div>
+                <div class="score-text">de aciertos</div>
+            </div>
+
+            <div class="results-details">
+                <p><strong>Preguntas correctas:</strong> <span id="correctCount"></span></p>
+                <p><strong>Preguntas incorrectas:</strong> <span id="incorrectCount"></span></p>
+                <p><strong>Total de preguntas:</strong> <span id="totalCount"></span></p>
+            </div>
+
+            <div class="button-group">
+                <button class="button" onclick="restartQuiz()">🔄 Repetir Quiz</button>
+                <button class="button button-secondary" onclick="newQuiz()">📝 Nuevo Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales para almacenar el estado del quiz
+        let questions = []; // Array con todas las preguntas parseadas
+        let currentQuestionIndex = 0; // Índice de la pregunta actual
+        let score = 0; // Puntuación del usuario
+        let answered = false; // Si la pregunta actual ya fue respondida
+
+        /**
+         * Función para parsear el texto de entrada y convertirlo en un array de objetos de preguntas
+         * @param {string} text - Texto ingresado por el usuario
+         * @returns {Array} Array de objetos con la estructura de cada pregunta
+         */
+        function parseQuestions(text) {
+            const parsed = [];
+            // Dividir el texto en bloques de preguntas (separadas por líneas en blanco)
+            const blocks = text.trim().split(/\n\s*\n/);
+
+            blocks.forEach(block => {
+                const lines = block.trim().split('\n').filter(line => line.trim());
+                if (lines.length === 0) return;
+
+                let question = null;
+                let options = [];
+                let correctAnswer = -1;
+
+                lines.forEach(line => {
+                    line = line.trim();
+                    
+                    // Detectar pregunta (comienza con "P:")
+                    if (line.startsWith('P:')) {
+                        question = line.substring(2).trim();
+                    }
+                    // Detectar opciones (comienzan con A), B), C), etc.)
+                    else if (/^[A-Z]\)/.test(line)) {
+                        const optionText = line.substring(2).trim();
+                        // Verificar si esta es la respuesta correcta (marcada con *)
+                        if (optionText.endsWith('*')) {
+                            correctAnswer = options.length;
+                            options.push(optionText.slice(0, -1).trim());
+                        } else {
+                            options.push(optionText);
+                        }
+                    }
+                });
+
+                // Solo agregar si tiene pregunta, opciones y respuesta correcta
+                if (question && options.length > 0 && correctAnswer !== -1) {
+                    parsed.push({
+                        question: question,
+                        options: options,
+                        correctAnswer: correctAnswer
+                    });
+                }
+            });
+
+            return parsed;
+        }
+
+        /**
+         * Función para mezclar aleatoriamente un array (algoritmo Fisher-Yates)
+         * @param {Array} array - Array a mezclar
+         * @returns {Array} Array mezclado
+         */
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        /**
+         * Inicia el quiz: parsea las preguntas, las mezcla y muestra la primera
+         */
+        function startQuiz() {
+            const input = document.getElementById('quizInput').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Validar que hay texto
+            if (!input.trim()) {
+                errorMessage.textContent = '⚠️ Por favor, introduce al menos una pregunta.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // Parsear preguntas
+            questions = parseQuestions(input);
+
+            // Validar que se parsearon preguntas correctamente
+            if (questions.length === 0) {
+                errorMessage.textContent = '⚠️ No se detectaron preguntas válidas. Revisa el formato.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // Ocultar mensaje de error si había alguno
+            errorMessage.style.display = 'none';
+
+            // Mezclar el orden de las preguntas
+            questions = shuffleArray(questions);
+
+            // Mezclar las opciones de cada pregunta y actualizar el índice de respuesta correcta
+            questions = questions.map(q => {
+                const correctOption = q.options[q.correctAnswer];
+                const shuffledOptions = shuffleArray(q.options);
+                return {
+                    question: q.question,
+                    options: shuffledOptions,
+                    correctAnswer: shuffledOptions.indexOf(correctOption)
+                };
+            });
+
+            // Reiniciar variables
+            currentQuestionIndex = 0;
+            score = 0;
+
+            // Cambiar de pantalla
+            document.getElementById('inputScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+
+            // Mostrar la primera pregunta
+            showQuestion();
+        }
+
+        /**
+         * Muestra la pregunta actual en la pantalla
+         */
+        function showQuestion() {
+            answered = false;
+            const question = questions[currentQuestionIndex];
+
+            // Actualizar contador de preguntas
+            document.getElementById('questionCounter').textContent = 
+                `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
+
+            // Actualizar barra de progreso
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Mostrar pregunta
+            document.getElementById('questionText').textContent = question.question;
+
+            // Mostrar opciones
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            // Ocultar feedback y botón siguiente
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('nextButton').style.display = 'none';
+        }
+
+        /**
+         * Maneja la selección de una opción por parte del usuario
+         * @param {number} selectedIndex - Índice de la opción seleccionada
+         */
+        function selectOption(selectedIndex) {
+            if (answered) return; // Si ya respondió, no hacer nada
+
+            answered = true;
+            const question = questions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option');
+            const feedback = document.getElementById('feedback');
+
+            // Deshabilitar todas las opciones
+            options.forEach(opt => opt.classList.add('disabled'));
+
+            // Marcar la opción correcta
+            options[question.correctAnswer].classList.add('correct');
+
+            // Verificar si la respuesta es correcta
+            if (selectedIndex === question.correctAnswer) {
+                score++;
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✅ ¡Correcto!';
+            } else {
+                // Marcar la opción incorrecta seleccionada
+                options[selectedIndex].classList.add('incorrect');
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = `❌ Incorrecto. La respuesta correcta es: ${question.options[question.correctAnswer]}`;
+            }
+
+            feedback.style.display = 'block';
+            document.getElementById('nextButton').style.display = 'block';
+        }
+
+        /**
+         * Avanza a la siguiente pregunta o muestra los resultados si terminó el quiz
+         */
+        function nextQuestion() {
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Muestra la pantalla de resultados finales
+         */
+        function showResults() {
+            const percentage = Math.round((score / questions.length) * 100);
+
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('resultsScreen').style.display = 'block';
+
+            document.getElementById('scorePercentage').textContent = percentage + '%';
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('incorrectCount').textContent = questions.length - score;
+            document.getElementById('totalCount').textContent = questions.length;
+        }
+
+        /**
+         * Reinicia el quiz con las mismas preguntas (mezcladas nuevamente)
+         */
+        function restartQuiz() {
+            // Mezclar preguntas nuevamente
+            questions = shuffleArray(questions);
+
+            // Mezclar opciones de cada pregunta
+            questions = questions.map(q => {
+                const correctOption = q.options[q.correctAnswer];
+                const shuffledOptions = shuffleArray(q.options);
+                return {
+                    question: q.question,
+                    options: shuffledOptions,
+                    correctAnswer: shuffledOptions.indexOf(correctOption)
+                };
+            });
+
+            currentQuestionIndex = 0;
+            score = 0;
+
+            document.getElementById('resultsScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+
+            showQuestion();
+        }
+
+        /**
+         * Vuelve a la pantalla inicial para crear un nuevo quiz
+         */
+        function newQuiz() {
+            document.getElementById('resultsScreen').style.display = 'none';
+            document.getElementById('inputScreen').style.display = 'block';
+            document.getElementById('quizInput').value = '';
+        }
+    </script>
+</body>
+</html>
