@@ -579,7 +579,7 @@ D) 8</div>
                     <li>Las opciones comienzan con A), B), C), etc.</li>
                     <li>Marca la respuesta correcta con un asterisco (*) al final</li>
                     <li>Deja una línea en blanco entre preguntas</li>
-                    <li>Cada error resta <strong>0.333 puntos</strong> de tu calificación</li>
+                    <li>Cada error resta <strong>1/3 de punto</strong> de tu calificación</li>
                 </ul>
             </div>
 
@@ -816,16 +816,16 @@ D) 8</div>
         }
 
         /**
-         * Calcula la nota: cada error resta exactamente 0.333
-         * Fórmula: Nota = (Aciertos - (Errores * 0.333)) / Total * 10
+         * Calcula la nota: cada error resta exactamente 1/3
+         * Fórmula: Nota = (Aciertos - (Errores / 3)) / Total * 10
          */
         function calculateGrade() {
             const A = score;
             const E = errors;
             const Total = questions.length;
             
-            // Cada error resta exactamente 0.333
-            const penalizacion = E * 0.333;
+            // Cada error resta exactamente 1/3 (fracción exacta)
+            const penalizacion = E / 3;
             const notaCalculada = ((A - penalizacion) / Total) * 10;
             
             return Math.max(0, notaCalculada);
@@ -835,7 +835,7 @@ D) 8</div>
             const percentage = Math.round((score / questions.length) * 100);
             const finalGrade = calculateGrade();
             const Total = questions.length;
-            const penalizacion = errors * 0.333;
+            const penalizacion = errors / 3;
 
             document.getElementById('quizScreen').style.display = 'none';
             document.getElementById('resultsScreen').style.display = 'block';
@@ -849,10 +849,10 @@ D) 8</div>
                 <strong>Desglose del Cálculo:</strong><br>
                 • Aciertos: ${score}<br>
                 • Errores: ${errors}<br>
-                • Penalización total: ${penalizacion.toFixed(3)} (cada error resta 0.333)<br>
-                • Puntuación neta: ${(score - penalizacion).toFixed(3)}<br>
+                • Penalización total: ${penalizacion.toFixed(4)} (cada error resta 1/3)<br>
+                • Puntuación neta: ${(score - penalizacion).toFixed(4)}<br>
                 • Total preguntas: ${Total}<br>
-                • <strong>Nota final: ((${score} - ${penalizacion.toFixed(3)}) / ${Total}) × 10 = ${finalGrade.toFixed(2)}</strong>
+                • <strong>Nota final: ((${score} - ${errors}/3) / ${Total}) × 10 = ${finalGrade.toFixed(2)}</strong>
             `;
         }
 
