@@ -3,9 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Quizzes</title>
+    <title>Quizzly - Sistema de Evaluación Profesional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Reset y estilos generales */
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #0f3460;
+            --highlight: #e94560;
+            --success: #06d6a0;
+            --error: #ef476f;
+            --text-primary: #1a1a2e;
+            --text-secondary: #6b7280;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --border: #e5e7eb;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,172 +29,305 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8edf2 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
-            padding: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Efecto de fondo decorativo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(233, 69, 96, 0.05) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            background: var(--bg-primary);
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.08),
+                0 0 0 1px rgba(0, 0, 0, 0.02);
             overflow: hidden;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 3rem 2.5rem;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--highlight), var(--accent), var(--highlight));
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
         }
 
         .subtitle {
-            opacity: 0.9;
-            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1rem;
+            font-weight: 400;
         }
 
-        /* Pantalla de entrada de texto */
+        /* Pantalla de entrada */
         .input-screen {
-            padding: 30px;
+            padding: 2.5rem;
         }
 
         .format-info {
-            background: #f0f4ff;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
         }
 
         .format-info h3 {
-            color: #667eea;
-            margin-bottom: 10px;
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
         }
 
         .format-example {
             background: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 0.9em;
-            margin-top: 10px;
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-top: 1rem;
             white-space: pre-line;
+            border: 1px solid #e0e7ff;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .format-info ul {
+            margin-left: 1.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .format-info li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
         }
 
         textarea {
             width: 100%;
-            min-height: 300px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            font-family: inherit;
+            min-height: 350px;
+            padding: 1.5rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'DM Sans', sans-serif;
             resize: vertical;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
         }
 
         textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.1);
         }
 
         /* Pantalla del quiz */
         .quiz-screen {
             display: none;
-            padding: 30px;
+            padding: 2.5rem;
+        }
+
+        .progress-container {
+            margin-bottom: 2rem;
         }
 
         .progress-bar {
-            background: #e0e0e0;
-            height: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            background: var(--bg-secondary);
+            height: 8px;
+            border-radius: 20px;
             overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
         }
 
         .progress-fill {
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(90deg, var(--accent), var(--highlight));
             height: 100%;
-            transition: width 0.3s ease;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 20px;
         }
 
         .question-counter {
             text-align: center;
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 0.95em;
+            color: var(--text-secondary);
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
         .question-card {
-            background: #f9f9f9;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 25px;
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
         }
 
         .question-text {
-            font-size: 1.2em;
-            color: #333;
-            margin-bottom: 20px;
-            line-height: 1.5;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35rem;
+            color: var(--text-primary);
+            margin-bottom: 1.75rem;
+            line-height: 1.6;
+            font-weight: 600;
         }
 
         .options {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 0.75rem;
         }
 
         .option {
             background: white;
-            border: 2px solid #e0e0e0;
-            padding: 15px;
-            border-radius: 8px;
+            border: 2px solid var(--border);
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .option:hover {
-            border-color: #667eea;
-            transform: translateX(5px);
+        .option::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--accent);
+            transform: scaleY(0);
+            transition: transform 0.25s ease;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: var(--accent);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(15, 52, 96, 0.1);
+        }
+
+        .option:hover:not(.disabled)::before {
+            transform: scaleY(1);
         }
 
         .option.selected {
-            border-color: #667eea;
-            background: #f0f4ff;
+            border-color: var(--accent);
+            background: rgba(15, 52, 96, 0.05);
         }
 
         .option.correct {
-            border-color: #4caf50;
-            background: #e8f5e9;
+            border-color: var(--success);
+            background: rgba(6, 214, 160, 0.1);
+            animation: correctPulse 0.5s ease;
+        }
+
+        .option.correct::before {
+            background: var(--success);
+            transform: scaleY(1);
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
         }
 
         .option.incorrect {
-            border-color: #f44336;
-            background: #ffebee;
+            border-color: var(--error);
+            background: rgba(239, 71, 111, 0.1);
+            animation: shake 0.5s ease;
+        }
+
+        .option.incorrect::before {
+            background: var(--error);
+            transform: scaleY(1);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
         }
 
         .option.disabled {
             cursor: not-allowed;
-            opacity: 0.7;
+            opacity: 0.6;
         }
 
         .feedback {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 8px;
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            border-radius: 12px;
             display: none;
             animation: slideIn 0.3s ease;
+            font-weight: 500;
         }
 
         @keyframes slideIn {
@@ -193,77 +342,136 @@
         }
 
         .feedback.correct {
-            background: #e8f5e9;
-            color: #2e7d32;
-            border-left: 4px solid #4caf50;
+            background: rgba(6, 214, 160, 0.15);
+            color: #047857;
+            border-left: 4px solid var(--success);
         }
 
         .feedback.incorrect {
-            background: #ffebee;
-            color: #c62828;
-            border-left: 4px solid #f44336;
+            background: rgba(239, 71, 111, 0.15);
+            color: #dc2626;
+            border-left: 4px solid var(--error);
         }
 
         /* Pantalla de resultados */
         .results-screen {
             display: none;
-            padding: 30px;
+            padding: 2.5rem;
             text-align: center;
         }
 
-        .score-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .results-screen h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+
+        .grade-display {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 30px auto;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            padding: 2.5rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(26, 26, 46, 0.2);
+            position: relative;
+            overflow: hidden;
         }
 
-        .score-percentage {
-            font-size: 3em;
-            font-weight: bold;
+        .grade-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
         }
 
-        .score-text {
-            font-size: 1em;
+        .grade-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .grade-label {
+            font-size: 1.1rem;
             opacity: 0.9;
+            position: relative;
+            z-index: 1;
         }
 
-        .results-details {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
-        .results-details p {
-            margin: 10px 0;
-            font-size: 1.1em;
-            color: #666;
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .calculation-detail {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .calculation-detail strong {
+            color: var(--primary);
         }
 
         /* Botones */
         .button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 1em;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            padding: 1rem 2rem;
+            font-size: 1rem;
             font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+            box-shadow: 0 4px 12px rgba(26, 26, 46, 0.2);
         }
 
         .button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 20px rgba(26, 26, 46, 0.3);
         }
 
         .button:active {
@@ -277,52 +485,67 @@
         }
 
         .button-secondary {
-            background: #6c757d;
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
         }
 
         .button-secondary:hover {
-            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+            box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
         }
 
         .button-group {
             display: flex;
-            gap: 15px;
+            gap: 1rem;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 1.5rem;
         }
 
         /* Mensajes de error */
         .error-message {
-            background: #ffebee;
-            color: #c62828;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #f44336;
+            background: rgba(239, 71, 111, 0.15);
+            color: #dc2626;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--error);
             display: none;
+            animation: slideIn 0.3s ease;
+            font-weight: 500;
         }
 
         /* Responsive */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
             .container {
-                border-radius: 0;
+                border-radius: 16px;
+            }
+
+            header {
+                padding: 2rem 1.5rem;
             }
 
             h1 {
-                font-size: 1.5em;
+                font-size: 2rem;
+            }
+
+            .input-screen,
+            .quiz-screen,
+            .results-screen {
+                padding: 1.5rem;
             }
 
             .button-group {
                 flex-direction: column;
             }
 
-            .score-circle {
-                width: 150px;
-                height: 150px;
+            .grade-number {
+                font-size: 3rem;
             }
 
-            .score-percentage {
-                font-size: 2.5em;
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -330,14 +553,14 @@
 <body>
     <div class="container">
         <header>
-            <h1>📝 Generador de Quizzes</h1>
-            <p class="subtitle">Crea y practica con tus propios cuestionarios</p>
+            <h1>Quizzly</h1>
+            <p class="subtitle">Sistema de Evaluación Profesional</p>
         </header>
 
-        <!-- Pantalla de entrada de texto -->
+        <!-- Pantalla de entrada -->
         <div class="input-screen" id="inputScreen">
             <div class="format-info">
-                <h3>📋 Formato de entrada:</h3>
+                <h3>📋 Formato de Entrada</h3>
                 <p>Introduce tus preguntas siguiendo este formato:</p>
                 <div class="format-example">P: ¿Cuál es la capital de Francia?
 A) Madrid
@@ -350,12 +573,13 @@ A) 5
 B) 6
 C) 7 *
 D) 8</div>
-                <p style="margin-top: 10px;"><strong>Instrucciones:</strong></p>
-                <ul style="margin-left: 20px; margin-top: 5px;">
-                    <li>Cada pregunta comienza con "P:"</li>
+                <p style="margin-top: 1rem;"><strong>Instrucciones:</strong></p>
+                <ul>
+                    <li>Cada pregunta comienza con "P:" (no sensible a mayúsculas)</li>
                     <li>Las opciones comienzan con A), B), C), etc.</li>
                     <li>Marca la respuesta correcta con un asterisco (*) al final</li>
                     <li>Deja una línea en blanco entre preguntas</li>
+                    <li>Cada error resta <strong>0.333 puntos</strong> de tu calificación</li>
                 </ul>
             </div>
 
@@ -364,17 +588,18 @@ D) 8</div>
             <textarea id="quizInput" placeholder="Introduce aquí tus preguntas siguiendo el formato indicado..."></textarea>
 
             <div class="button-group">
-                <button class="button" onclick="startQuiz()">🚀 Comenzar Quiz</button>
+                <button class="button" onclick="startQuiz()">Comenzar Evaluación →</button>
             </div>
         </div>
 
         <!-- Pantalla del quiz -->
         <div class="quiz-screen" id="quizScreen">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="question-counter" id="questionCounter"></div>
             </div>
-
-            <div class="question-counter" id="questionCounter"></div>
 
             <div class="question-card">
                 <div class="question-text" id="questionText"></div>
@@ -384,48 +609,56 @@ D) 8</div>
 
             <div class="button-group">
                 <button class="button" id="nextButton" onclick="nextQuestion()" style="display: none;">
-                    Siguiente →
+                    Siguiente Pregunta →
                 </button>
             </div>
         </div>
 
         <!-- Pantalla de resultados -->
         <div class="results-screen" id="resultsScreen">
-            <h2>🎉 ¡Quiz Completado!</h2>
+            <h2>Evaluación Completada</h2>
             
-            <div class="score-circle">
-                <div class="score-percentage" id="scorePercentage"></div>
-                <div class="score-text">de aciertos</div>
+            <div class="grade-display">
+                <div class="grade-number" id="gradeNumber"></div>
+                <div class="grade-label">Calificación Final</div>
             </div>
 
-            <div class="results-details">
-                <p><strong>Preguntas correctas:</strong> <span id="correctCount"></span></p>
-                <p><strong>Preguntas incorrectas:</strong> <span id="incorrectCount"></span></p>
-                <p><strong>Total de preguntas:</strong> <span id="totalCount"></span></p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="correctCount" style="color: var(--success);"></div>
+                    <div class="stat-label">Respuestas Correctas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="incorrectCount" style="color: var(--error);"></div>
+                    <div class="stat-label">Respuestas Incorrectas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="percentageDisplay"></div>
+                    <div class="stat-label">Porcentaje de Aciertos</div>
+                </div>
             </div>
+
+            <div class="calculation-detail" id="calculationDetail"></div>
 
             <div class="button-group">
-                <button class="button" onclick="restartQuiz()">🔄 Repetir Quiz</button>
-                <button class="button button-secondary" onclick="newQuiz()">📝 Nuevo Quiz</button>
+                <button class="button" onclick="restartQuiz()">🔄 Reintentar Evaluación</button>
+                <button class="button button-secondary" onclick="newQuiz()">📝 Nueva Evaluación</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Variables globales para almacenar el estado del quiz
-        let questions = []; // Array con todas las preguntas parseadas
-        let currentQuestionIndex = 0; // Índice de la pregunta actual
-        let score = 0; // Puntuación del usuario
-        let answered = false; // Si la pregunta actual ya fue respondida
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let errors = 0;
+        let answered = false;
 
         /**
-         * Función para parsear el texto de entrada y convertirlo en un array de objetos de preguntas
-         * @param {string} text - Texto ingresado por el usuario
-         * @returns {Array} Array de objetos con la estructura de cada pregunta
+         * Parser insensible a mayúsculas/minúsculas
          */
         function parseQuestions(text) {
             const parsed = [];
-            // Dividir el texto en bloques de preguntas (separadas por líneas en blanco)
             const blocks = text.trim().split(/\n\s*\n/);
 
             blocks.forEach(block => {
@@ -439,14 +672,11 @@ D) 8</div>
                 lines.forEach(line => {
                     line = line.trim();
                     
-                    // Detectar pregunta (comienza con "P:")
-                    if (line.startsWith('P:')) {
+                    if (/^p:/i.test(line)) {
                         question = line.substring(2).trim();
                     }
-                    // Detectar opciones (comienzan con A), B), C), etc.)
-                    else if (/^[A-Z]\)/.test(line)) {
+                    else if (/^[a-z]\)/i.test(line)) {
                         const optionText = line.substring(2).trim();
-                        // Verificar si esta es la respuesta correcta (marcada con *)
                         if (optionText.endsWith('*')) {
                             correctAnswer = options.length;
                             options.push(optionText.slice(0, -1).trim());
@@ -456,12 +686,12 @@ D) 8</div>
                     }
                 });
 
-                // Solo agregar si tiene pregunta, opciones y respuesta correcta
                 if (question && options.length > 0 && correctAnswer !== -1) {
                     parsed.push({
                         question: question,
                         options: options,
-                        correctAnswer: correctAnswer
+                        correctAnswer: correctAnswer,
+                        numOptions: options.length
                     });
                 }
             });
@@ -469,11 +699,6 @@ D) 8</div>
             return parsed;
         }
 
-        /**
-         * Función para mezclar aleatoriamente un array (algoritmo Fisher-Yates)
-         * @param {Array} array - Array a mezclar
-         * @returns {Array} Array mezclado
-         */
         function shuffleArray(array) {
             const shuffled = [...array];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -483,78 +708,61 @@ D) 8</div>
             return shuffled;
         }
 
-        /**
-         * Inicia el quiz: parsea las preguntas, las mezcla y muestra la primera
-         */
         function startQuiz() {
             const input = document.getElementById('quizInput').value;
             const errorMessage = document.getElementById('errorMessage');
 
-            // Validar que hay texto
             if (!input.trim()) {
                 errorMessage.textContent = '⚠️ Por favor, introduce al menos una pregunta.';
                 errorMessage.style.display = 'block';
                 return;
             }
 
-            // Parsear preguntas
             questions = parseQuestions(input);
 
-            // Validar que se parsearon preguntas correctamente
             if (questions.length === 0) {
                 errorMessage.textContent = '⚠️ No se detectaron preguntas válidas. Revisa el formato.';
                 errorMessage.style.display = 'block';
                 return;
             }
 
-            // Ocultar mensaje de error si había alguno
             errorMessage.style.display = 'none';
 
-            // Mezclar el orden de las preguntas
             questions = shuffleArray(questions);
 
-            // Mezclar las opciones de cada pregunta y actualizar el índice de respuesta correcta
             questions = questions.map(q => {
                 const correctOption = q.options[q.correctAnswer];
                 const shuffledOptions = shuffleArray(q.options);
                 return {
                     question: q.question,
                     options: shuffledOptions,
-                    correctAnswer: shuffledOptions.indexOf(correctOption)
+                    correctAnswer: shuffledOptions.indexOf(correctOption),
+                    numOptions: q.numOptions
                 };
             });
 
-            // Reiniciar variables
             currentQuestionIndex = 0;
             score = 0;
+            errors = 0;
 
-            // Cambiar de pantalla
             document.getElementById('inputScreen').style.display = 'none';
             document.getElementById('quizScreen').style.display = 'block';
 
-            // Mostrar la primera pregunta
             showQuestion();
         }
 
-        /**
-         * Muestra la pregunta actual en la pantalla
-         */
         function showQuestion() {
             answered = false;
             const question = questions[currentQuestionIndex];
 
-            // Actualizar contador de preguntas
             document.getElementById('questionCounter').textContent = 
                 `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
 
-            // Actualizar barra de progreso
             const progress = ((currentQuestionIndex) / questions.length) * 100;
             document.getElementById('progressFill').style.width = progress + '%';
 
-            // Mostrar pregunta
             document.getElementById('questionText').textContent = question.question;
 
-            // Mostrar opciones
             const optionsContainer = document.getElementById('optionsContainer');
             optionsContainer.innerHTML = '';
 
@@ -566,48 +774,37 @@ D) 8</div>
                 optionsContainer.appendChild(optionDiv);
             });
 
-            // Ocultar feedback y botón siguiente
             document.getElementById('feedback').style.display = 'none';
             document.getElementById('nextButton').style.display = 'none';
         }
 
-        /**
-         * Maneja la selección de una opción por parte del usuario
-         * @param {number} selectedIndex - Índice de la opción seleccionada
-         */
         function selectOption(selectedIndex) {
-            if (answered) return; // Si ya respondió, no hacer nada
+            if (answered) return;
 
             answered = true;
             const question = questions[currentQuestionIndex];
             const options = document.querySelectorAll('.option');
             const feedback = document.getElementById('feedback');
 
-            // Deshabilitar todas las opciones
             options.forEach(opt => opt.classList.add('disabled'));
 
-            // Marcar la opción correcta
             options[question.correctAnswer].classList.add('correct');
 
-            // Verificar si la respuesta es correcta
             if (selectedIndex === question.correctAnswer) {
                 score++;
                 feedback.className = 'feedback correct';
-                feedback.textContent = '✅ ¡Correcto!';
+                feedback.textContent = '✓ Respuesta correcta';
             } else {
-                // Marcar la opción incorrecta seleccionada
+                errors++;
                 options[selectedIndex].classList.add('incorrect');
                 feedback.className = 'feedback incorrect';
-                feedback.textContent = `❌ Incorrecto. La respuesta correcta es: ${question.options[question.correctAnswer]}`;
+                feedback.textContent = `✗ Respuesta incorrecta. La correcta es: ${question.options[question.correctAnswer]}`;
             }
 
             feedback.style.display = 'block';
             document.getElementById('nextButton').style.display = 'block';
         }
 
-        /**
-         * Avanza a la siguiente pregunta o muestra los resultados si terminó el quiz
-         */
         function nextQuestion() {
             currentQuestionIndex++;
 
@@ -619,40 +816,63 @@ D) 8</div>
         }
 
         /**
-         * Muestra la pantalla de resultados finales
+         * Calcula la nota: cada error resta exactamente 0.333
+         * Fórmula: Nota = (Aciertos - (Errores * 0.333)) / Total * 10
          */
+        function calculateGrade() {
+            const A = score;
+            const E = errors;
+            const Total = questions.length;
+            
+            // Cada error resta exactamente 0.333
+            const penalizacion = E * 0.333;
+            const notaCalculada = ((A - penalizacion) / Total) * 10;
+            
+            return Math.max(0, notaCalculada);
+        }
+
         function showResults() {
             const percentage = Math.round((score / questions.length) * 100);
+            const finalGrade = calculateGrade();
+            const Total = questions.length;
+            const penalizacion = errors * 0.333;
 
             document.getElementById('quizScreen').style.display = 'none';
             document.getElementById('resultsScreen').style.display = 'block';
 
-            document.getElementById('scorePercentage').textContent = percentage + '%';
+            document.getElementById('gradeNumber').textContent = finalGrade.toFixed(2) + ' / 10';
             document.getElementById('correctCount').textContent = score;
-            document.getElementById('incorrectCount').textContent = questions.length - score;
-            document.getElementById('totalCount').textContent = questions.length;
+            document.getElementById('incorrectCount').textContent = errors;
+            document.getElementById('percentageDisplay').textContent = percentage + '%';
+
+            document.getElementById('calculationDetail').innerHTML = `
+                <strong>Desglose del Cálculo:</strong><br>
+                • Aciertos: ${score}<br>
+                • Errores: ${errors}<br>
+                • Penalización total: ${penalizacion.toFixed(3)} (cada error resta 0.333)<br>
+                • Puntuación neta: ${(score - penalizacion).toFixed(3)}<br>
+                • Total preguntas: ${Total}<br>
+                • <strong>Nota final: ((${score} - ${penalizacion.toFixed(3)}) / ${Total}) × 10 = ${finalGrade.toFixed(2)}</strong>
+            `;
         }
 
-        /**
-         * Reinicia el quiz con las mismas preguntas (mezcladas nuevamente)
-         */
         function restartQuiz() {
-            // Mezclar preguntas nuevamente
             questions = shuffleArray(questions);
 
-            // Mezclar opciones de cada pregunta
             questions = questions.map(q => {
                 const correctOption = q.options[q.correctAnswer];
                 const shuffledOptions = shuffleArray(q.options);
                 return {
                     question: q.question,
                     options: shuffledOptions,
-                    correctAnswer: shuffledOptions.indexOf(correctOption)
+                    correctAnswer: shuffledOptions.indexOf(correctOption),
+                    numOptions: q.numOptions
                 };
             });
 
             currentQuestionIndex = 0;
             score = 0;
+            errors = 0;
 
             document.getElementById('resultsScreen').style.display = 'none';
             document.getElementById('quizScreen').style.display = 'block';
@@ -660,9 +880,6 @@ D) 8</div>
             showQuestion();
         }
 
-        /**
-         * Vuelve a la pantalla inicial para crear un nuevo quiz
-         */
         function newQuiz() {
             document.getElementById('resultsScreen').style.display = 'none';
             document.getElementById('inputScreen').style.display = 'block';
